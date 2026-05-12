@@ -1,0 +1,33 @@
+<% component_statuses = Decidim::Accountability::Status.where(decidim_component_id: result.decidim_component_id).order(:progress) %>
+
+<% items.each do |item| %>
+  <div class="accountability__project-aside-item">
+    <div><%= icon item[:icon], class: "w-3.5 h-3.5 fill-current text-gray" %><%= item[:text] %></div>
+
+      <% if item[:icon] == "focus-2-line" %>
+        <% if component_statuses.any? %>
+
+          <% current_index = component_statuses.index { |s| s.id == status&.id } || -1 %>
+          <ol class="accountability__status-timeline">
+            <% component_statuses.each_with_index do |status_entry, i| %>
+              <% is_active = status&.id == status_entry.id %>
+              <% is_filled = i <= current_index %>
+              <li class="accountability__status-timeline-item">
+                <div class="accountability__status-timeline-dot<%= ' accountability__status-timeline-dot--filled' if is_filled %>">
+                  <%= i + 1 %>
+                </div>
+                <div>
+                  <h3 class="accountability__status-timeline-label<%= is_active ? ' accountability__status-timeline-label--active' : is_filled ? ' accountability__status-timeline-label--filled' : '' %>">
+                    <%= decidim_escape_translated(status_entry.name) %>
+                  </h3>
+                </div>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
+
+      <% else %>
+        <div><%= item[:value] %></div>
+      <% end %>
+    </div>
+<% end %>
